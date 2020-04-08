@@ -1,15 +1,27 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { axiosWithAuth } from '../utils/axiosWithAuth';
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+// const addColor = {
+//     color: "",
+//     code: {
+//       hex: ""
+//     },
+//     id: Date.now()
+//   }
+
+
+const ColorList = ({ colors, updateColors, props }) => {
+  console.log(props);
+  
+
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  //const [newColor, setNewColor] = useState(addColor);
 
   const editColor = color => {
     setEditing(true);
@@ -17,15 +29,38 @@ const ColorList = ({ colors, updateColors }) => {
   };
 
   const saveEdit = e => {
-    e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+    axiosWithAuth()
+    .put(`colors/${colorToEdit.id}`, colorToEdit)
+    .then(res =>{
+      //console.log(res.data);
+      setColorToEdit(res.data)
+      setEditing(false);
+      props.history.push(`/protected`) 
+    })
+    .catch(err => console.log(err))
   };
 
   const deleteColor = color => {
-    // make a delete request to delete this color
+    axiosWithAuth()
+    .delete(`colors/${color.id}`)
+    .then(res => {
+      setColorToEdit(res.data)
+      props.history.push(`/protected`);
+    })
+    .catch(err=> console.log(err))
   };
+
+  // const addColor = e => {
+  //   axiosWithAuth()
+  //   .post(`colors/`, newColor)
+  //   .then(res =>{
+  //     console.log(res.data);
+  //     setNewColor({colors: [res.data,
+  //     res.data.payload]});
+  //     props.history.push(`/protected`);
+  //   })
+  //   .catch(err=> console.log(err));
+  // }
 
   return (
     <div className="colors-wrap">
@@ -50,6 +85,11 @@ const ColorList = ({ colors, updateColors }) => {
           </li>
         ))}
       </ul>
+      <div className="buttom-row">
+
+        <button>Add New color </button>
+
+      </div>
       {editing && (
         <form onSubmit={saveEdit}>
           <legend>edit color</legend>

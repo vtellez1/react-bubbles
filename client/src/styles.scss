@@ -60,9 +60,14 @@ body,
   margin-right: 36px;
 }
 
+.loginBox{
+  margin: 0 auto;
+}
+
 form {
   margin-top: 60px;
   display: flex;
+  align-items: center;
   flex-direction: column;
 
   legend {
